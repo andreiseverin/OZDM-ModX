@@ -275,7 +275,7 @@ public plugin_precache()
 // ====== cvars start ammo ===== (add weapon ammo value)
 	cvar_start_ammo_crossbow   = create_cvar("sv_ozdm_start_ammo_crossbow", "50");
 	cvar_start_ammo_buckshot   = create_cvar("sv_ozdm_start_ammo_buckshot", "100");
-	cvar_start_ammo_rpgclip    = create_cvar("sv_ozdm_start_ammo_rpgclip", "50");
+	cvar_start_ammo_rpgclip    = create_cvar("sv_ozdm_start_ammo_rpgclip", "5");
 	cvar_start_ammo_9mmAR      = create_cvar("sv_ozdm_start_ammo_9mmAR", "50");
 	cvar_start_ammo_357        = create_cvar("sv_ozdm_start_ammo_357", "50");
 	cvar_start_ammo_glock      = create_cvar("sv_ozdm_start_ammo_glock", "100");
@@ -994,17 +994,48 @@ public Weapons_Damages(victim, inflictor, Float:damage, Float:direction[3], trac
 	if(!(1 <= inflictor <= maxplayers))
 	return HAM_IGNORED
 
+	// dmg 9mmhandgun
 	if(get_user_weapon(inflictor) == HLW_GLOCK)
-	SetHamParamFloat(3, 50.0)
-
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_9mmhandgun))
+	// dmg 357
 	if(get_user_weapon(inflictor) == HLW_PYTHON)
-	SetHamParamFloat(3, 150.0)
-
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_357))
+	// dmg shotgun
 	if(get_user_weapon(inflictor) == HLW_SHOTGUN)
-	SetHamParamFloat(3, 60.0)
-
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_shotgun))
+	// dmg 9mmAR
 	if(get_user_weapon(inflictor) == HLW_MP5)
-	SetHamParamFloat(3, 40.0)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_9mmAR))
+	// dmg rpg
+	if(get_user_weapon(inflictor) == HLW_RPG)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_rpg))
+	// dmg gauss
+	if(get_user_weapon(inflictor) == HLW_GAUSS)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_gauss))
+	// dmg egon
+	if(get_user_weapon(inflictor) == HLW_EGON)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_egon))
+	// dmg crossbow
+	if(get_user_weapon(inflictor) == HLW_CROSSBOW)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_crossbow))
+    // dmg crowbar
+	if(get_user_weapon(inflictor) == HLW_CROWBAR)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_crowbar))
+	// dmg satchel
+	if(get_user_weapon(inflictor) == HLW_SATCHEL)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_satchel))
+	// dmg tripmine
+	if(get_user_weapon(inflictor) == HLW_TRIPMINE)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_tripmine))
+	// dmg snark
+	if(get_user_weapon(inflictor) == HLW_SNARK)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_snark))
+	// dmg handgrenade
+	if(get_user_weapon(inflictor) == HLW_HANDGRENADE)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_handgrenade))
+	// dmg hornetgun
+	if(get_user_weapon(inflictor) == HLW_HORNETGUN)
+	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_hornetgun))
 
 	return HAM_IGNORED
 }
