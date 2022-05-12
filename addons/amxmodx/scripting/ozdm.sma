@@ -311,8 +311,8 @@ public plugin_precache()
 	cvar_dmg_shotgun           = create_cvar("sv_ozdm_dmg_shotgun", "20");
 	cvar_dmg_9mmAR             = create_cvar("sv_ozdm_dmg_9mmAR", "12");
 	cvar_dmg_handgrenade       = create_cvar("sv_ozdm_dmg_handgrenade", "100");
-	cvar_dmg_snark             = create_cvar("sv_ozdm_dmg_snark", "1");
-	cvar_dmg_tripmine          = create_cvar("sv_ozdm_dmg_tripmine", "150");
+	cvar_dmg_snark             = create_cvar("sv_ozdm_dmg_snark", "10");
+	cvar_dmg_tripmine          = create_cvar("sv_ozdm_dmg_tripmine", "150"); 
 
 	blood_drop                 = precache_model("sprites/blood.spr");
 	blood_spray                = precache_model("sprites/bloodspray.spr");
@@ -350,8 +350,8 @@ public plugin_init()
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_shotgun", "shotgun_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_crossbow", "crossbow_primary_attack_pre", 0)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_crossbow", "crossbow_primary_attack_post", 1)
-	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmAR", "mp5_primary_attack_pre", 0)	//to check
-	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmAR", "mp5_primary_attack_post", 1) //to check
+	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmAR", "mp5_primary_attack_pre", 0)	
+	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmAR", "mp5_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_rpg", "rpg_primary_attack_pre", 0)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_rpg", "rpg_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_357", "colt_primary_attack_post", 1)
@@ -365,7 +365,8 @@ public plugin_init()
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_satchel", "satchel_secondary_attack_post", 1)
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_9mmAR", "grenades_secondary_attack_post", 1)
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_357", "colt_secondary_attack_post", 1)	
-
+	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_crowbar", "SecondaryAttack_Crowbar")
+	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_handgrenade", "Grenade_SecondaryAttack_Post", 1)
 	//RegisterHam(Ham_Weapon_Reload, "weapon_shotgun", "shotgun_reload_pre" , 0)
 	//RegisterHam(Ham_Weapon_Reload, "weapon_shotgun", "shotgun_reload_post", 1)
 	RegisterHam(Ham_Weapon_Reload, "weapon_crossbow" , "crossbow_reload_post", 1)
@@ -382,9 +383,6 @@ public plugin_init()
 
 	register_message(get_user_msgid("DeathMsg"), "DeathMsg")
 	register_event("ResetHUD", "newSpawn", "be")
-	
-	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_crowbar", "SecondaryAttack_Crowbar")
-	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_handgrenade", "Grenade_SecondaryAttack_Post", 1)
 
 	for(new a = 0; a <sizeof _weapon; a++)
 	{
@@ -880,9 +878,39 @@ public glock_primary_attack_pre(this)
     //restore 9mmhandgun ammo 
 	if (hl_get_weapon_ammo((hl_user_has_weapon(player,HLW_GLOCK))) == 1)
 	 set_task(2.0, "restore_glock_ammo", player)
- 
 	old_clip[player] = get_pdata_int(this, m_iClip, LINUX_OFF_SET_4)
+}
 
+// 9mmhandgun firing speed (MOUSE1) -2
+public glock_primary_attack_post(this)
+{
+	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextSecondaryAttack", 9999.0)
+
+	new player = get_pdata_cbase(this, m_pPlayer, LINUX_OFF_SET_4)
+
+	if(old_clip[player] <= 0)
+		return
+
+	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextPrimaryAttack", 0.10)
+
+	if(get_pdata_int(this, m_iClip, LINUX_OFF_SET_4) != 0)
+		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 2.0)
+	else
+		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 0.3)
+}
+
+// 9mmhandgun secondary attack
+
+public glock_secondary_attack(const entity)
+{
+	return HAM_SUPERCEDE
+} 
+
+public glock_reload(const gloc)
+{
+	new id = get_pdata_cbase(gloc, m_pPlayer, 4)
+
+	set_pev(id, pev_fov, fov)
 }
 
  //restore 9mmhandgun ammo 
@@ -916,25 +944,6 @@ public hornet_primary_attack_pre(this)
 	//set_ent_data_float(this, "CBasePlayerWeapon", "m_flFlySpeed", 600.0);   // to do  - m_flFlySpeed doesnt exist as a class
 }
 
-
-// 9mmhandgun firing speed (MOUSE1) -2
-public glock_primary_attack_post(this)
-{
-	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextSecondaryAttack", 9999.0)
-
-	new player = get_pdata_cbase(this, m_pPlayer, LINUX_OFF_SET_4)
-
-	if(old_clip[player] <= 0)
-		return
-
-	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextPrimaryAttack", 0.1)
-
-	if(get_pdata_int(this, m_iClip, LINUX_OFF_SET_4) != 0)
-		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 2.0)
-	else
-		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 0.3)
-}
-
 // Snark firing speed (MOUSE1) 
 public snark_primary_attack_post(this)
 {
@@ -953,19 +962,6 @@ public crowbar_primary_attack_post(this)
 	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextPrimaryAttack", 0.1)
 }
 
-// 9mmhandgun secondary attack
-
-public glock_secondary_attack(const entity)
-{
-	return HAM_SUPERCEDE
-} 
-
-public glock_reload(const gloc)
-{
-	new id = get_pdata_cbase(gloc, m_pPlayer, 4)
-
-	set_pev(id, pev_fov, fov)
-}
 
 // crowbar throw on MOUSE 2
 public SecondaryAttack_Crowbar(this)
@@ -998,43 +994,43 @@ public Weapons_Damages(victim, inflictor, Float:damage, Float:direction[3], trac
 	if(get_user_weapon(inflictor) == HLW_GLOCK)
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_9mmhandgun))
 	// dmg 357
-	if(get_user_weapon(inflictor) == HLW_PYTHON)
+	if(get_user_weapon(inflictor) == HLW_PYTHON) //working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_357))
 	// dmg shotgun
-	if(get_user_weapon(inflictor) == HLW_SHOTGUN)
+	if(get_user_weapon(inflictor) == HLW_SHOTGUN) // working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_shotgun))
 	// dmg 9mmAR
-	if(get_user_weapon(inflictor) == HLW_MP5)
+	if(get_user_weapon(inflictor) == HLW_MP5) //working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_9mmAR))
 	// dmg rpg
-	if(get_user_weapon(inflictor) == HLW_RPG)
+	if(get_user_weapon(inflictor) == HLW_RPG) //not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_rpg))
 	// dmg gauss
-	if(get_user_weapon(inflictor) == HLW_GAUSS)
+	if(get_user_weapon(inflictor) == HLW_GAUSS)  // working but it deals the same damage on both primary and secondary attacks - need to verify 
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_gauss))
 	// dmg egon
-	if(get_user_weapon(inflictor) == HLW_EGON)
+	if(get_user_weapon(inflictor) == HLW_EGON) //working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_egon))
 	// dmg crossbow
-	if(get_user_weapon(inflictor) == HLW_CROSSBOW)
+	if(get_user_weapon(inflictor) == HLW_CROSSBOW) // not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_crossbow))
     // dmg crowbar
-	if(get_user_weapon(inflictor) == HLW_CROWBAR)
+	if(get_user_weapon(inflictor) == HLW_CROWBAR) //working 
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_crowbar))
 	// dmg satchel
-	if(get_user_weapon(inflictor) == HLW_SATCHEL)
+	if(get_user_weapon(inflictor) == HLW_SATCHEL) // not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_satchel))
 	// dmg tripmine
-	if(get_user_weapon(inflictor) == HLW_TRIPMINE)
+	if(get_user_weapon(inflictor) == HLW_TRIPMINE) // not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_tripmine))
 	// dmg snark
-	if(get_user_weapon(inflictor) == HLW_SNARK)
+	if(get_user_weapon(inflictor) == HLW_SNARK) //now working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_snark))
 	// dmg handgrenade
-	if(get_user_weapon(inflictor) == HLW_HANDGRENADE)
+	if(get_user_weapon(inflictor) == HLW_HANDGRENADE) //not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_handgrenade))
 	// dmg hornetgun
-	if(get_user_weapon(inflictor) == HLW_HORNETGUN)
+	if(get_user_weapon(inflictor) == HLW_HORNETGUN) //not working
 	SetHamParamFloat(3, get_pcvar_float(cvar_dmg_hornetgun))
 
 	return HAM_IGNORED
