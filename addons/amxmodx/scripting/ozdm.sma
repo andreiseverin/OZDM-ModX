@@ -342,7 +342,6 @@ public plugin_init()
 	RegisterHam(Ham_Item_Holster, "weapon_9mmhandgun", "item_holster", 1)
 
 	
-	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_snark", "snark_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_crowbar", "crowbar_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmhandgun", "glock_primary_attack_pre" , 0)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_9mmhandgun", "glock_primary_attack_post", 1)
@@ -358,6 +357,7 @@ public plugin_init()
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_357", "colt_primary_attack_pre", 0)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_gauss", "gauss_primary_attack_pre", 0)
 	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_hornetgun", "hornet_primary_attack_pre", 0)
+	RegisterHam(Ham_Weapon_PrimaryAttack, "weapon_snark", "snark_primary_attack_post", 1)
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_9mmhandgun", "glock_secondary_attack")
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_shotgun", "shotgun_secondary_attack_pre" , 0)
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_shotgun", "shotgun_secondary_attack_post", 1)
@@ -367,6 +367,7 @@ public plugin_init()
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_357", "colt_secondary_attack_post", 1)	
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_crowbar", "SecondaryAttack_Crowbar")
 	RegisterHam(Ham_Weapon_SecondaryAttack, "weapon_handgrenade", "Grenade_SecondaryAttack_Post", 1)
+	
 	//RegisterHam(Ham_Weapon_Reload, "weapon_shotgun", "shotgun_reload_pre" , 0)
 	//RegisterHam(Ham_Weapon_Reload, "weapon_shotgun", "shotgun_reload_post", 1)
 	RegisterHam(Ham_Weapon_Reload, "weapon_crossbow" , "crossbow_reload_post", 1)
@@ -879,6 +880,7 @@ public glock_primary_attack_pre(this)
 	if (hl_get_weapon_ammo((hl_user_has_weapon(player,HLW_GLOCK))) == 1)
 	 set_task(2.0, "restore_glock_ammo", player)
 	old_clip[player] = get_pdata_int(this, m_iClip, LINUX_OFF_SET_4)
+
 }
 
 // 9mmhandgun firing speed (MOUSE1) -2
@@ -897,6 +899,7 @@ public glock_primary_attack_post(this)
 		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 2.0)
 	else
 		set_ent_data_float(this, "CBasePlayerWeapon", "m_flTimeWeaponIdle", 0.3)
+	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextPrimaryAttack", 0.10)
 }
 
 // 9mmhandgun secondary attack
@@ -1149,9 +1152,9 @@ public CmdStart(id, uc_handle, seed)
 	}
 }
 
-public item_holster(const gloc)
+public item_holster(this)
 {
-	new id = get_pdata_cbase(gloc, m_pPlayer, 4)
+	new id = get_pdata_cbase(this, m_pPlayer, 4)
 
 	set_pev(id, pev_fov, fov)
 
@@ -1160,7 +1163,7 @@ public item_holster(const gloc)
 
 public item_deploy(this)
 {
-	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextPrimaryAttack", 9999.0);
+	set_ent_data_float(this, "CBasePlayerWeapon", "m_flNextSecondaryAttack", 9999.0);
 
 	new id = get_pdata_cbase(this, m_pPlayer, 4)
 
