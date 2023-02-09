@@ -85,3 +85,6 @@ sv_ozdm_wings 1
 
 ```
 
+## To do
+
+Add the rune system
