@@ -17,7 +17,7 @@ All credit for the ideas go the the authors
 - [@teylo](https://github.com/andreiseverin)
 
 ## Author of the original mod 
-- [@OZ Deathmatch team](www.ozdeathmatch.com)
+- OZ Deathmatch team - www.ozdeathmatch.com
 
 
 
