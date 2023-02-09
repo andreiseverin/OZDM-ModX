@@ -20,6 +20,8 @@ All credit for the ideas go the the authors
 - OZ Deathmatch team - www.ozdeathmatch.com
 
 
+## Requirements
+Amxmodx 1.9.0 +
 
 ## Installation
 
